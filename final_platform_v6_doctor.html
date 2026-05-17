@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الكتب الجامعية - قسم الآثار</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a237e; --primary-light: #283593; --secondary: #5c6bc0;
+            --accent: #ff9800; --success: #43a047; --danger: #e53935;
+            --warning: #fb8c00; --bg: #f0f2f5; --card: #ffffff;
+            --text: #2c3e50; --text-light: #7f8c8d;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+        /* LOGIN */
+        .login-wrapper {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%);
+            position: relative; overflow: hidden;
+        }
+        .login-wrapper::before {
+            content: ''; position: absolute; width: 200%; height: 200%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            animation: bgMove 60s linear infinite;
+        }
+        @keyframes bgMove { 0% { transform: translate(0,0); } 100% { transform: translate(-50%,-50%); } }
+
+        .login-card {
+            background: rgba(255,255,255,0.97); backdrop-filter: blur(20px); border-radius: 24px;
+            padding: 45px 40px; width: 100%; max-width: 500px; box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            position: relative; z-index: 1; animation: cardEntry 0.8s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes cardEntry { from { opacity:0; transform: translateY(40px) scale(0.95); } to { opacity:1; transform: translateY(0) scale(1); } }
+
+        .login-header { text-align: center; margin-bottom: 30px; }
+        .login-logo {
+            width: 85px; height: 85px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 18px; font-size: 38px; box-shadow: 0 10px 30px rgba(26,35,126,0.3);
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+        @keyframes logoPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .login-header h1 { color: var(--primary); font-size: 24px; font-weight: 900; margin-bottom: 6px; }
+        .login-header p { color: var(--text-light); font-size: 14px; }
+
+        .input-wrap { margin-bottom: 18px; position: relative; }
+        .input-wrap label { display: block; margin-bottom: 6px; font-weight: 700; color: var(--text); font-size: 13px; }
+        .input-wrap input, .input-wrap select {
+            width: 100%; padding: 14px 18px; border: 2px solid #e0e6ed; border-radius: 12px;
+            font-size: 15px; font-family: 'Cairo', sans-serif; transition: all 0.3s; background: #fafbfc;
+        }
+        .input-wrap input:focus, .input-wrap select:focus {
+            outline: none; border-color: var(--secondary); background: white;
+            box-shadow: 0 0 0 4px rgba(92,107,192,0.1);
+        }
+        .input-wrap input::placeholder { color: #b0b8c4; font-weight: 400; }
+        .input-wrap input[type="text"] { text-align: center; letter-spacing: 1px; }
+
+        .btn-main {
+            width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 16px;
+            font-family: 'Cairo', sans-serif; font-weight: 700; cursor: pointer; transition: all 0.3s;
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; margin-top: 8px;
+        }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(26,35,126,0.35); }
+
+        .alert {
+            padding: 12px 16px; border-radius: 10px; margin-top: 14px; font-size: 13px; font-weight: 600;
+            display: none; align-items: center; gap: 8px; animation: shake 0.4s ease;
+        }
+        .alert-error { background: #ffebee; color: var(--danger); border-right: 4px solid var(--danger); }
+        .alert-warning { background: #fff3e0; color: var(--warning); border-right: 4px solid var(--warning); }
+        .alert-success { background: #e8f5e9; color: var(--success); border-right: 4px solid var(--success); }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+        .admin-trigger { text-align: center; margin-top: 22px; padding-top: 18px; border-top: 1px dashed #ddd; }
+        .btn-ghost {
+            background: transparent; border: 2px solid #e0e6ed; color: var(--text-light);
+            padding: 10px 24px; border-radius: 10px; font-family: 'Cairo', sans-serif;
+            font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-ghost:hover { border-color: var(--primary); color: var(--primary); background: rgba(26,35,126,0.05); }
+
+        .hint-box {
+            background: #e8eaf6; border-radius: 10px; padding: 12px 14px; margin-bottom: 18px;
+            font-size: 12px; color: var(--primary); text-align: center; font-weight: 600;
+        }
+
+        /* APP */
+        .app { display: none; }
+        .topbar {
+            background: var(--card); padding: 16px 28px; box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-icon {
+            width: 42px; height: 42px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;
+        }
+        .brand-text h3 { color: var(--primary); font-size: 16px; font-weight: 900; }
+        .brand-text span { color: var(--text-light); font-size: 11px; }
+        .user-pill { display: flex; align-items: center; gap: 10px; }
+        .pill {
+            background: #e8eaf6; color: var(--primary); padding: 7px 16px;
+            border-radius: 20px; font-size: 12px; font-weight: 700;
+        }
+        .btn-icon {
+            width: 38px; height: 38px; border-radius: 10px; border: none;
+            background: #ffebee; color: var(--danger); cursor: pointer; font-size: 16px;
+            transition: all 0.3s; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-icon:hover { background: var(--danger); color: white; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 22px; }
+
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 18px;
+            padding: 28px 32px; color: white; margin-bottom: 22px; box-shadow: 0 10px 30px rgba(26,35,126,0.2);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .welcome-info h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; }
+        .welcome-info p { font-size: 14px; opacity: 0.9; }
+        .welcome-avatar {
+            width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 28px;
+        }
+
+        .tabs-bar {
+            display: flex; gap: 8px; margin-bottom: 22px; background: var(--card);
+            padding: 8px; border-radius: 14px; box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+        }
+        .tab-btn {
+            flex: 1; padding: 12px; border: none; background: transparent; border-radius: 10px;
+            cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 13px;
+            color: var(--text-light); transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .tab-btn:hover { background: #f5f7fa; color: var(--text); }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; box-shadow: 0 4px 15px rgba(26,35,126,0.25);
+        }
+
+        .section { display: none; animation: fadeUp 0.4s ease; }
+        .section.active { display: block; }
+        @keyframes fadeUp { from { opacity:0; transform: translateY(15px); } to { opacity:1; transform: translateY(0); } }
+
+        .section-header { margin-bottom: 22px; }
+        .section-header h2 { color: var(--primary); font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+        .section-header h2::before { content: ''; width: 5px; height: 28px; background: linear-gradient(to bottom, var(--primary), var(--secondary)); border-radius: 3px; }
+        .section-header p { color: var(--text-light); font-size: 13px; margin-top: 5px; padding-right: 15px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+
+        .book {
+            background: var(--card); border-radius: 16px; padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: all 0.3s;
+            border: 1px solid transparent; position: relative; overflow: hidden;
+        }
+        .book::before {
+            content: ''; position: absolute; top: 0; right: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0); transform-origin: right; transition: transform 0.3s;
+        }
+        .book:hover::before { transform: scaleX(1); }
+        .book:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.1); border-color: #e8eaf6; }
+        .book-cover {
+            width: 65px; height: 85px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 26px; margin-bottom: 16px; position: relative;
+            box-shadow: 0 8px 20px rgba(26,35,126,0.2);
+        }
+        .book-cover::after { content: 'PDF'; position: absolute; bottom: 5px; left: 5px; font-size: 9px; background: rgba(255,255,255,0.25); padding: 2px 5px; border-radius: 3px; font-weight: 700; }
+        .book h4 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 5px; line-height: 1.5; }
+        .book-meta { color: var(--text-light); font-size: 12px; margin-bottom: 16px; }
+
+        .btn-green {
+            width: 100%; padding: 11px; border: none; border-radius: 10px;
+            background: linear-gradient(135deg, var(--success), #66bb6a); color: white;
+            font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 13px;
+            cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-green:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(67,160,71,0.3); }
+
+        .exam-box {
+            background: var(--card); border-radius: 16px; padding: 26px; margin-bottom: 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-right: 4px solid var(--accent);
+        }
+        .exam-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; padding-bottom: 16px; border-bottom: 1px solid #f0f0f0; }
+        .exam-top h3 { color: var(--primary); font-size: 17px; }
+        .tag { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .tag-open { background: #e8f5e9; color: var(--success); }
+        .question { background: #fafbfc; border-radius: 12px; padding: 20px; margin-bottom: 14px; border: 1px solid #eef0f4; }
+        .question p { font-weight: 700; margin-bottom: 12px; color: var(--text); font-size: 14px; }
+        .opts { display: flex; flex-direction: column; gap: 8px; }
+        .opt { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: white; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; font-size: 13px; }
+        .opt:hover { border-color: var(--secondary); background: #f5f7ff; }
+        .opt input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); flex-shrink: 0; }
+        .btn-dark { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 12px 40px; border-radius: 10px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 8px; transition: all 0.3s; }
+        .btn-dark:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(26,35,126,0.3); }
+
+        .result-panel { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border: 2px solid var(--success); border-radius: 12px; padding: 25px; margin-top: 22px; text-align: center; display: none; }
+        .result-panel.show { display: block; animation: popIn 0.5s ease; }
+        @keyframes popIn { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
+        .big-score { font-size: 48px; font-weight: 900; color: var(--success); line-height: 1; }
+        .result-label { color: #2e7d32; font-weight: 700; margin-top: 8px; font-size: 14px; }
+
+        .material-card { background: var(--card); border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: all 0.3s; text-align: center; }
+        .material-card:hover { transform: translateY(-4px); box-shadow: 0 12px 35px rgba(0,0,0,0.08); }
+        .mat-icon { width: 55px; height: 55px; background: linear-gradient(135deg, var(--accent), #ffb74d); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; color: white; font-size: 24px; }
+
+        /* ADMIN MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal { background: var(--card); border-radius: 22px; width: 100%; max-width: 750px; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 80px rgba(0,0,0,0.3); animation: modalIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes modalIn { from { opacity:0; transform: translateY(30px) scale(0.95); } to { opacity:1; transform: translateY(0) scale(1); } }
+        .modal-head { padding: 28px 32px 0; text-align: center; }
+        .modal-head h2 { color: var(--primary); font-size: 20px; margin-bottom: 6px; }
+        .modal-head p { color: var(--text-light); font-size: 13px; }
+        .modal-body { padding: 22px 32px 32px; }
+
+        .admin-tabs { display: flex; gap: 6px; margin-bottom: 20px; background: #f5f7fa; padding: 6px; border-radius: 12px; }
+        .admin-tab { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 10px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 13px; color: var(--text-light); transition: all 0.3s; }
+        .admin-tab:hover { background: white; color: var(--text); }
+        .admin-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+
+        .file-manager { background: #fafbfc; border-radius: 14px; padding: 20px; border: 1px solid #eef0f4; }
+        .upload-area { border: 2px dashed #c5cae9; border-radius: 14px; padding: 35px 25px; text-align: center; margin-bottom: 20px; transition: all 0.3s; cursor: pointer; background: white; }
+        .upload-area:hover, .upload-area.dragover { border-color: var(--secondary); background: #f5f7ff; }
+        .upload-area .upload-icon { font-size: 40px; margin-bottom: 10px; }
+        .upload-area p { color: var(--text-light); font-size: 14px; margin-bottom: 8px; }
+        .upload-area small { color: #b0b8c4; font-size: 12px; }
+        .upload-area input[type="file"] { display: none; }
+        .upload-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .upload-meta .input-wrap { margin-bottom: 0; }
+        .upload-meta select, .upload-meta input { width: 100%; padding: 12px 14px; border: 2px solid #e0e6ed; border-radius: 10px; font-size: 14px; font-family: 'Cairo', sans-serif; background: white; }
+        .upload-meta select:focus, .upload-meta input:focus { outline: none; border-color: var(--secondary); }
+        .progress-track { width: 100%; height: 8px; background: #e8eaf6; border-radius: 4px; margin-top: 12px; overflow: hidden; display: none; }
+        .progress-track.show { display: block; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); width: 0%; transition: width 0.4s; border-radius: 4px; }
+
+        .files-list { margin-top: 20px; }
+        .files-list h4 { color: var(--primary); font-size: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .file-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: white; border-radius: 10px; margin-bottom: 8px; border: 1px solid #eef0f4; transition: all 0.2s; }
+        .file-item:hover { border-color: var(--secondary); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .file-info { display: flex; align-items: center; gap: 12px; }
+        .file-icon { width: 40px; height: 40px; background: #ffebee; color: #c62828; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .file-details strong { color: var(--text); font-size: 14px; display: block; }
+        .file-details small { color: var(--text-light); font-size: 11px; }
+        .file-actions { display: flex; gap: 6px; }
+        .btn-mini { padding: 6px 12px; border: none; border-radius: 6px; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+        .btn-mini-view { background: #e8eaf6; color: var(--primary); }
+        .btn-mini-view:hover { background: var(--primary); color: white; }
+        .btn-mini-del { background: #ffebee; color: var(--danger); }
+        .btn-mini-del:hover { background: var(--danger); color: white; }
+
+        .student-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fafbfc; border-radius: 10px; margin-bottom: 8px; border: 1px solid #eef0f4; transition: all 0.2s; }
+        .student-row:hover { background: #f5f7ff; }
+        .student-row.blocked { background: #ffebee; border-color: #ffcdd2; }
+        .student-info strong { color: var(--primary); font-size: 13px; }
+        .student-info small { color: var(--text-light); font-size: 11px; }
+        .btn-unlock { background: #e8f5e9; color: var(--success); border: none; padding: 7px 16px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; transition: all 0.3s; }
+        .btn-unlock:hover { background: var(--success); color: white; }
+        .btn-close-modal { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #ffebee; color: var(--danger); font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; margin-top: 18px; transition: all 0.3s; }
+        .btn-close-modal:hover { background: var(--danger); color: white; }
+
+        .lock-screen { display: none; position: fixed; inset: 0; background: linear-gradient(135deg, #1a237e, #0d1642); z-index: 2000; justify-content: center; align-items: center; flex-direction: column; text-align: center; color: white; padding: 30px; }
+        .lock-icon { font-size: 80px; margin-bottom: 25px; animation: lockShake 1s ease-in-out infinite; }
+        @keyframes lockShake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+        .lock-screen h2 { font-size: 28px; font-weight: 900; margin-bottom: 12px; }
+        .lock-screen p { font-size: 15px; opacity: 0.8; max-width: 380px; line-height: 1.8; }
+
+        .app-footer { text-align: center; padding: 25px; color: var(--text-light); font-size: 12px; }
+
+        /* ===== DOCTOR DASHBOARD ===== */
+        .doctor-app { display: none; min-height: 100vh; background: var(--bg); }
+        .doctor-topbar {
+            background: linear-gradient(135deg, #1a237e, #283593);
+            padding: 16px 28px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .doctor-brand { display: flex; align-items: center; gap: 14px; }
+        .doctor-brand-icon {
+            width: 46px; height: 46px; background: rgba(255,255,255,0.15); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .doctor-brand-text h3 { color: white; font-size: 17px; font-weight: 900; }
+        .doctor-brand-text span { color: rgba(255,255,255,0.7); font-size: 11px; }
+        .doctor-badge {
+            background: var(--accent); color: white; padding: 6px 16px;
+            border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-logout-doc {
+            background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3);
+            color: white; padding: 9px 18px; border-radius: 10px;
+            font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 13px;
+            cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-logout-doc:hover { background: rgba(255,255,255,0.25); border-color: white; }
+
+        .doctor-container { max-width: 1100px; margin: 0 auto; padding: 26px 22px; }
+
+        .doctor-welcome {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px; padding: 30px 36px; color: white; margin-bottom: 26px;
+            box-shadow: 0 12px 35px rgba(26,35,126,0.25);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .doctor-welcome h2 { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+        .doctor-welcome p { opacity: 0.85; font-size: 14px; }
+        .doctor-welcome-icon { font-size: 60px; opacity: 0.9; }
+
+        .doc-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 26px; }
+        .doc-stat {
+            background: var(--card); border-radius: 16px; padding: 20px 22px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px;
+            border-right: 5px solid transparent; transition: all 0.3s;
+        }
+        .doc-stat:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .doc-stat.blue { border-right-color: var(--primary); }
+        .doc-stat.green { border-right-color: var(--success); }
+        .doc-stat.orange { border-right-color: var(--accent); }
+        .doc-stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .doc-stat-icon.blue { background: #e8eaf6; }
+        .doc-stat-icon.green { background: #e8f5e9; }
+        .doc-stat-icon.orange { background: #fff3e0; }
+        .doc-stat-info h3 { font-size: 26px; font-weight: 900; color: var(--text); line-height: 1; }
+        .doc-stat-info span { font-size: 12px; color: var(--text-light); font-weight: 600; }
+
+        .doc-tabs {
+            display: flex; gap: 8px; margin-bottom: 24px; background: var(--card);
+            padding: 8px; border-radius: 16px; box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+        .doc-tab {
+            flex: 1; padding: 13px; border: none; background: transparent; border-radius: 10px;
+            cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 14px;
+            color: var(--text-light); transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .doc-tab:hover { background: #f5f7fa; color: var(--text); }
+        .doc-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; box-shadow: 0 4px 15px rgba(26,35,126,0.25);
+        }
+        .doc-section { display: none; animation: fadeUp 0.4s ease; }
+        .doc-section.active { display: block; }
+
+        /* Upload panel */
+        .upload-panel {
+            background: var(--card); border-radius: 20px; padding: 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .upload-panel-header {
+            background: linear-gradient(135deg, #e8eaf6, #c5cae9);
+            border-radius: 14px; padding: 22px 24px; margin-bottom: 24px;
+            border-right: 6px solid var(--primary); display: flex; align-items: center; gap: 16px;
+        }
+        .upload-panel-header .icon { font-size: 36px; }
+        .upload-panel-header h3 { color: var(--primary); font-size: 18px; font-weight: 900; margin-bottom: 5px; }
+        .upload-panel-header p { color: var(--text); font-size: 13px; line-height: 1.7; }
+
+        .upload-form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .upload-form-grid .input-wrap { margin-bottom: 0; }
+        .upload-form-grid select, .upload-form-grid input {
+            width: 100%; padding: 13px 15px; border: 2px solid #e0e6ed; border-radius: 11px;
+            font-size: 14px; font-family: 'Cairo', sans-serif; background: #fafbfc; transition: all 0.3s;
+        }
+        .upload-form-grid select:focus, .upload-form-grid input:focus {
+            outline: none; border-color: var(--secondary); background: white;
+            box-shadow: 0 0 0 4px rgba(92,107,192,0.1);
+        }
+        .title-input-row { margin-bottom: 18px; }
+        .title-input-row input {
+            width: 100%; padding: 14px 18px; border: 2px solid #e0e6ed; border-radius: 11px;
+            font-size: 15px; font-family: 'Cairo', sans-serif; background: #fafbfc; transition: all 0.3s;
+        }
+        .title-input-row input:focus { outline: none; border-color: var(--secondary); background: white; box-shadow: 0 0 0 4px rgba(92,107,192,0.1); }
+
+        .drop-zone {
+            border: 3px dashed #c5cae9; border-radius: 16px; padding: 50px 30px;
+            text-align: center; cursor: pointer; background: #fafbff; transition: all 0.3s;
+            margin-bottom: 20px; position: relative;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--secondary); background: #f0f3ff;
+            box-shadow: 0 0 0 5px rgba(92,107,192,0.1);
+        }
+        .drop-zone-icon { font-size: 52px; margin-bottom: 14px; display: block; }
+        .drop-zone h4 { color: var(--primary); font-size: 17px; font-weight: 900; margin-bottom: 8px; }
+        .drop-zone p { color: var(--text-light); font-size: 13px; margin-bottom: 4px; }
+        .drop-zone small { color: #b0b8c4; font-size: 12px; }
+        .drop-zone input[type="file"] { display: none; }
+        .selected-file-preview {
+            background: #e8f5e9; border: 2px solid var(--success); border-radius: 12px;
+            padding: 16px 20px; display: none; align-items: center; gap: 14px; margin-bottom: 16px;
+        }
+        .selected-file-preview.show { display: flex; }
+        .selected-file-preview .file-preview-icon { font-size: 30px; }
+        .selected-file-preview .file-preview-info strong { color: var(--success); font-size: 14px; display: block; }
+        .selected-file-preview .file-preview-info small { color: #388e3c; font-size: 12px; }
+        .btn-upload-now {
+            width: 100%; padding: 17px; border: none; border-radius: 14px;
+            background: linear-gradient(135deg, var(--success), #66bb6a); color: white;
+            font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 16px;
+            cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 8px 25px rgba(67,160,71,0.25);
+        }
+        .btn-upload-now:hover { transform: translateY(-2px); box-shadow: 0 14px 35px rgba(67,160,71,0.35); }
+        .btn-upload-now:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .doc-progress { width: 100%; height: 10px; background: #e8eaf6; border-radius: 5px; margin: 14px 0; overflow: hidden; display: none; }
+        .doc-progress.show { display: block; }
+        .doc-progress-fill { height: 100%; background: linear-gradient(90deg, var(--success), #66bb6a); width: 0%; transition: width 0.3s; border-radius: 5px; }
+
+        .files-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 26px; }
+        .doc-file-card {
+            background: #fafbfc; border: 1px solid #eef0f4; border-radius: 14px;
+            padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.3s;
+        }
+        .doc-file-card:hover { border-color: #c5cae9; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .doc-file-left { display: flex; align-items: center; gap: 16px; }
+        .doc-file-pdf-icon {
+            width: 48px; height: 56px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 900; position: relative; flex-shrink: 0;
+        }
+        .doc-file-pdf-icon.book { background: linear-gradient(135deg, #e8eaf6, #c5cae9); color: var(--primary); }
+        .doc-file-pdf-icon.exam { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: var(--warning); }
+        .doc-file-pdf-icon.extra { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: var(--success); }
+        .doc-file-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+        .doc-file-meta { font-size: 12px; color: var(--text-light); display: flex; gap: 10px; flex-wrap: wrap; }
+        .doc-file-meta span { background: #f0f2f5; padding: 2px 8px; border-radius: 6px; }
+        .doc-file-btns { display: flex; gap: 8px; flex-shrink: 0; }
+        .btn-doc-view { background: #e8eaf6; color: var(--primary); border: none; padding: 8px 16px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .btn-doc-view:hover { background: var(--primary); color: white; }
+        .btn-doc-del { background: #ffebee; color: var(--danger); border: none; padding: 8px 16px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .btn-doc-del:hover { background: var(--danger); color: white; }
+        .btn-doc-edit { background: #fff3e0; color: var(--warning); border: none; padding: 8px 16px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .btn-doc-edit:hover { background: var(--warning); color: white; }
+
+        .empty-files { text-align: center; padding: 50px 20px; color: var(--text-light); }
+        .empty-files .empty-icon { font-size: 60px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-files h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+
+        /* Edit form inside doc dashboard */
+        .doc-edit-box {
+            display: none; background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            border-radius: 16px; padding: 24px; margin: 20px 0;
+            border-right: 5px solid var(--warning);
+        }
+        .doc-edit-box.show { display: block; animation: fadeUp 0.3s ease; }
+
+        @media (max-width: 768px) {
+            .doctor-topbar { flex-direction: column; gap: 12px; padding: 14px 16px; }
+            .doctor-welcome { flex-direction: column; text-align: center; gap: 14px; }
+            .doc-stats { grid-template-columns: 1fr; }
+            .upload-form-grid { grid-template-columns: 1fr; }
+            .doc-tabs { flex-direction: column; }
+            .doc-file-card { flex-direction: column; gap: 12px; align-items: flex-start; }
+        }
+
+        @media (max-width: 768px) {
+            .login-card { padding: 30px 22px; margin: 12px; }
+            .welcome-card { flex-direction: column; text-align: center; gap: 15px; }
+            .tabs-bar { flex-direction: column; }
+            .topbar { padding: 12px 16px; flex-direction: column; gap: 10px; }
+            .grid { grid-template-columns: 1fr; }
+            .exam-top { flex-direction: column; gap: 10px; align-items: flex-start; }
+            .upload-meta { grid-template-columns: 1fr; }
+            .file-item { flex-direction: column; gap: 10px; align-items: flex-start; }
+            .modal { max-width: 95%; }
+        }
+
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 22px; }
+        .stat-card { background: var(--card); border-radius: 14px; padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 14px; }
+        .stat-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .stat-icon.blue { background: #e8eaf6; }
+        .stat-icon.green { background: #e8f5e9; }
+        .stat-icon.orange { background: #fff3e0; }
+        .stat-info h4 { font-size: 20px; color: var(--text); }
+        .stat-info span { font-size: 12px; color: var(--text-light); }
+    </style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div class="login-wrapper" id="loginPage">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-logo">📚</div>
+            <h1>منصة الكتب الجامعية</h1>
+            <p>قسم الآثار · كلية الآداب · الترم الأول</p>
+        </div>
+
+        <div class="hint-box">
+            🔑 أدخل بياناتك للدخول إلى فرقتك الدراسية
+        </div>
+
+        <div class="input-wrap">
+            <label>الاسم الرباعي</label>
+            <input type="text" id="inName" placeholder="أدخل اسمك الرباعي" autocomplete="off">
+        </div>
+
+        <div class="input-wrap">
+            <label>رقم الطالب</label>
+            <input type="text" id="inStuNum" placeholder="أدخل رقم الطالب" autocomplete="off" inputmode="numeric">
+        </div>
+
+        <div class="input-wrap">
+            <label>الفرقة الدراسية</label>
+            <select id="inGroup">
+                <option value="">-- اختر الفرقة --</option>
+                <option value="A1">الفرقة الأولى - آثار</option>
+                <option value="A2">الفرقة الثانية - آثار يونانى ورومانى</option>
+                <option value="A3">الفرقة الثالثة - آثار</option>
+                <option value="A4">الفرقة الرابعة - آثار</option>
+            </select>
+        </div>
+
+        <div class="input-wrap">
+            <label>كلمة المرور</label>
+            <input type="text" id="inPwd" placeholder="مثال: A11234AB" autocomplete="off" spellcheck="false">
+        </div>
+
+        <button class="btn-main" onclick="doLogin()">الدخول إلى المنصة</button>
+
+        <div class="alert alert-error" id="errBox">❌ البيانات غير صحيحة</div>
+        <div class="alert alert-warning" id="warnBox">⚠️ تبقت محاولة واحدة فقط!</div>
+        <div class="alert alert-success" id="succBox">✓ جاري الدخول...</div>
+
+        <div class="admin-trigger">
+            <button class="btn-ghost" onclick="openAdmin()">🔐 لوحة تحكم الدكتور (رفع المادة العلمية)</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="app" id="app">
+    <div class="topbar">
+        <div class="brand">
+            <div class="brand-icon">📚</div>
+            <div class="brand-text">
+                <h3 id="groupName">الفرقة الأولى - آثار</h3>
+                <span>الترم الدراسي الأول 2025/2026</span>
+            </div>
+        </div>
+        <div class="user-pill">
+            <span class="pill" id="studentPill">رقم الطالب: 1</span>
+            <button class="btn-icon" onclick="doLogout()" title="خروج">🚪</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="welcome-card">
+            <div class="welcome-info">
+                <h2 id="welcomeName">أهلاً، أحمد محمد علي حسن</h2>
+                <p id="welcomeGroup">الفرقة الأولى - آثار · رقم الطالب: 1</p>
+            </div>
+            <div class="welcome-avatar">👨‍🎓</div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue">📖</div>
+                <div class="stat-info">
+                    <h4 id="statBooks">8</h4>
+                    <span>كتب دراسية</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">📝</div>
+                <div class="stat-info">
+                    <h4 id="statExams">2</h4>
+                    <span>امتحانات متاحة</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">📎</div>
+                <div class="stat-info">
+                    <h4 id="statFiles">4</h4>
+                    <span>ملفات إضافية</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs-bar">
+            <button class="tab-btn active" onclick="switchTab('books', this)">
+                <span>📖</span> الكتب الدراسية
+            </button>
+            <button class="tab-btn" onclick="switchTab('exams', this)">
+                <span>📝</span> الامتحانات
+            </button>
+            <button class="tab-btn" onclick="switchTab('extra', this)">
+                <span>📎</span> ملحقات
+            </button>
+        </div>
+
+        <div class="section active" id="sec-books">
+            <div class="section-header">
+                <h2>الكتب الدراسية</h2>
+                <p>الكتب الدراسية بصيغة PDF · يتم رفعها وإدارتها من لوحة تحكم الدكتور</p>
+            </div>
+            <div class="grid" id="booksGrid"></div>
+        </div>
+
+        <div class="section" id="sec-exams">
+            <div class="section-header">
+                <h2>الامتحانات الإلكترونية</h2>
+                <p>اختبارات تفاعلية مع تصحيح آلي فوري</p>
+            </div>
+            <div id="examsWrap"></div>
+        </div>
+
+        <div class="section" id="sec-extra">
+            <div class="section-header">
+                <h2>ملحقات ومصادر إضافية</h2>
+                <p>جداول محاضرات، نماذج إجابة، ومراجع مساعدة · يتم رفعها من لوحة تحكم الدكتور</p>
+            </div>
+            <div class="grid" id="extraGrid"></div>
+        </div>
+
+        <div class="app-footer">
+            <p>منصة الكتب الجامعية · قسم الآثار © 2025</p>
+            <p>جميع الحقوق محفوظة · للاستفسار التواصل مع الدكتور</p>
+        </div>
+    </div>
+</div>
+
+<!-- ================= DOCTOR DASHBOARD (FULL PAGE) ================= -->
+<div class="doctor-app" id="doctorApp">
+    <div class="doctor-topbar">
+        <div class="doctor-brand">
+            <div class="doctor-brand-icon">🎓</div>
+            <div class="doctor-brand-text">
+                <h3>لوحة تحكم الدكتور</h3>
+                <span>منصة الكتب الجامعية · قسم الآثار · 2025/2026</span>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div class="doctor-badge">🔐 وضع المسؤول</div>
+            <button class="btn-logout-doc" onclick="doctorLogout()">🚪 خروج</button>
+        </div>
+    </div>
+
+    <div class="doctor-container">
+        <div class="doctor-welcome">
+            <div>
+                <h2>أهلاً بك يا دكتور 👋</h2>
+                <p>من هنا يمكنك رفع المادة العلمية بصيغة PDF وإدارة الطلاب ومتابعة نتائج الامتحانات</p>
+            </div>
+            <div class="doctor-welcome-icon">📚</div>
+        </div>
+
+        <div class="doc-stats">
+            <div class="doc-stat blue">
+                <div class="doc-stat-icon blue">📄</div>
+                <div class="doc-stat-info">
+                    <h3 id="docStatTotal">0</h3>
+                    <span>إجمالي الملفات المرفوعة</span>
+                </div>
+            </div>
+            <div class="doc-stat green">
+                <div class="doc-stat-icon green">👥</div>
+                <div class="doc-stat-info">
+                    <h3>280</h3>
+                    <span>إجمالي الطلاب</span>
+                </div>
+            </div>
+            <div class="doc-stat orange">
+                <div class="doc-stat-icon orange">📊</div>
+                <div class="doc-stat-info">
+                    <h3 id="docStatResults">0</h3>
+                    <span>نتائج امتحانات</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doc-tabs">
+            <button class="doc-tab active" onclick="switchDocTab('upload', this)">📤 رفع مادة علمية</button>
+            <button class="doc-tab" onclick="switchDocTab('files', this)">📂 الملفات المرفوعة</button>
+            <button class="doc-tab" onclick="switchDocTab('students', this)">👥 الطلاب</button>
+            <button class="doc-tab" onclick="switchDocTab('results', this)">📊 النتائج</button>
+        </div>
+
+        <!-- ====== قسم رفع ملف جديد ====== -->
+        <div class="doc-section active" id="doc-upload">
+            <div class="upload-panel">
+                <div class="upload-panel-header">
+                    <div class="icon">📤</div>
+                    <div>
+                        <h3>رفع مادة علمية جديدة</h3>
+                        <p>ارفع ملفات PDF مباشرة للطلاب · الكتب الدراسية · الامتحانات · الملحقات<br>
+                        <strong style="color:var(--primary);">الملف يظهر للطلاب فوراً في أقسامهم بمجرد الرفع.</strong></p>
+                    </div>
+                </div>
+
+                <div class="upload-form-grid">
+                    <div class="input-wrap">
+                        <label>🎓 الفرقة المستهدفة</label>
+                        <select id="docUpGroup">
+                            <option value="ALL">📢 جميع الفرق</option>
+                            <option value="A1">الفرقة الأولى - آثار</option>
+                            <option value="A2">الفرقة الثانية - آثار يونانى ورومانى</option>
+                            <option value="A3">الفرقة الثالثة - آثار</option>
+                            <option value="A4">الفرقة الرابعة - آثار</option>
+                        </select>
+                    </div>
+                    <div class="input-wrap">
+                        <label>📂 نوع المادة</label>
+                        <select id="docUpType">
+                            <option value="book">📖 كتاب دراسي</option>
+                            <option value="extra">📎 ملحق / مصدر إضافي</option>
+                        </select>
+                    </div>
+                    <div class="input-wrap">
+                        <label>🏷️ وسم / تصنيف</label>
+                        <input type="text" id="docUpTag" placeholder="مثال: ترم أول، د. أحمد...">
+                    </div>
+                </div>
+
+                <div class="title-input-row">
+                    <label style="display:block; font-weight:700; font-size:14px; margin-bottom:8px; color:var(--text);">✏️ عنوان المادة العلمية <span style="color:var(--danger);">*</span></label>
+                    <input type="text" id="docUpTitle" placeholder="مثال: مقدمة في علم الآثار - د. محمد السيد - الفصل الأول">
+                </div>
+
+                <div class="drop-zone" id="docDropZone" onclick="document.getElementById('docFileInput').click()">
+                    <span class="drop-zone-icon">📄</span>
+                    <h4>انقر هنا أو اسحب ملف PDF وأفلته</h4>
+                    <p>يدعم الملفات بصيغة PDF فقط</p>
+                    <small>الحد الأقصى للحجم: 50 ميجابايت</small>
+                    <input type="file" id="docFileInput" accept=".pdf" onchange="docHandleFile(this)">
+                </div>
+
+                <div class="selected-file-preview" id="docFilePreview">
+                    <div class="file-preview-icon">📄</div>
+                    <div class="file-preview-info">
+                        <strong id="docPreviewName">اسم الملف.pdf</strong>
+                        <small id="docPreviewSize">0 MB</small>
+                    </div>
+                </div>
+
+                <div class="doc-progress" id="docProgress">
+                    <div class="doc-progress-fill" id="docProgressBar"></div>
+                </div>
+
+                <button class="btn-upload-now" id="btnDocUpload" onclick="docUploadFile()" disabled>
+                    📤 رفع الملف الآن
+                </button>
+            </div>
+        </div>
+
+        <!-- ====== قسم قائمة الملفات ====== -->
+        <div class="doc-section" id="doc-files">
+            <div class="upload-panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <h3 style="color:var(--primary); font-size:18px; font-weight:900;">📂 الملفات المرفوعة على المنصة</h3>
+                        <p style="color:var(--text-light); font-size:13px; margin-top:4px;">جميع ملفات PDF التي تم رفعها وهي متاحة للطلاب الآن</p>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <select id="filterGroup" onchange="renderDocFilesList()" style="padding:9px 14px; border:2px solid #e0e6ed; border-radius:10px; font-family:'Cairo',sans-serif; font-size:13px; background:#fafbfc;">
+                            <option value="ALL">جميع الفرق</option>
+                            <option value="A1">الفرقة الأولى</option>
+                            <option value="A2">الفرقة الثانية</option>
+                            <option value="A3">الفرقة الثالثة</option>
+                            <option value="A4">الفرقة الرابعة</option>
+                        </select>
+                        <select id="filterType" onchange="renderDocFilesList()" style="padding:9px 14px; border:2px solid #e0e6ed; border-radius:10px; font-family:'Cairo',sans-serif; font-size:13px; background:#fafbfc;">
+                            <option value="ALL">جميع الأنواع</option>
+                            <option value="book">كتب دراسية</option>
+                            <option value="exam">امتحانات</option>
+                            <option value="extra">ملحقات</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- نموذج تعديل الملف -->
+                <div class="doc-edit-box" id="docEditBox">
+                    <h4 style="color:var(--warning); font-size:15px; margin-bottom:16px;">✏️ تعديل بيانات الملف</h4>
+                    <input type="hidden" id="docEditId">
+                    <div class="upload-form-grid" style="margin-bottom:14px;">
+                        <div class="input-wrap">
+                            <label>🎓 الفرقة</label>
+                            <select id="docEditGroup">
+                                <option value="ALL">جميع الفرق</option>
+                                <option value="A1">الفرقة الأولى</option>
+                                <option value="A2">الفرقة الثانية</option>
+                                <option value="A3">الفرقة الثالثة</option>
+                                <option value="A4">الفرقة الرابعة</option>
+                            </select>
+                        </div>
+                        <div class="input-wrap">
+                            <label>📂 النوع</label>
+                            <select id="docEditType">
+                                <option value="book">📖 كتاب دراسي</option>
+                                <option value="extra">📎 ملحق</option>
+                            </select>
+                        </div>
+                        <div class="input-wrap">
+                            <label>🏷️ الوسم</label>
+                            <input type="text" id="docEditTag" placeholder="وسم أو تصنيف">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-weight:700; font-size:13px; margin-bottom:6px;">✏️ العنوان</label>
+                        <input type="text" id="docEditTitle" style="width:100%; padding:13px 15px; border:2px solid #ffe0b2; border-radius:10px; font-size:14px; font-family:'Cairo',sans-serif;" placeholder="عنوان المادة">
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="docSaveEdit()" style="flex:1; padding:13px; background:linear-gradient(135deg,var(--warning),#ffb74d); color:white; border:none; border-radius:10px; font-family:'Cairo',sans-serif; font-weight:700; font-size:14px; cursor:pointer;">💾 حفظ التعديلات</button>
+                        <button onclick="docCancelEdit()" style="flex:1; padding:13px; background:#ffebee; color:var(--danger); border:none; border-radius:10px; font-family:'Cairo',sans-serif; font-weight:700; font-size:14px; cursor:pointer;">❌ إلغاء</button>
+                    </div>
+                </div>
+
+                <div id="docFilesGrid"></div>
+            </div>
+        </div>
+
+        <!-- ====== قسم الطلاب ====== -->
+        <div class="doc-section" id="doc-students">
+            <div class="upload-panel">
+                <h3 style="color:var(--primary); font-size:18px; font-weight:900; margin-bottom:20px;">👥 قائمة الطلاب والحالة</h3>
+                <div id="docStudentList"></div>
+            </div>
+        </div>
+
+        <!-- ====== قسم النتائج ====== -->
+        <div class="doc-section" id="doc-results">
+            <div class="upload-panel">
+                <h3 style="color:var(--primary); font-size:18px; font-weight:900; margin-bottom:20px;">📊 نتائج الامتحانات</h3>
+                <div id="docResultsList"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="modal-overlay" id="adminModal">
+    <div class="modal">
+        <div class="modal-head">
+            <h2>🔐 لوحة تحكم الدكتور</h2>
+            <p>مركز رفع المادة العلمية PDF · إدارة الطلاب · متابعة النتائج</p>
+        </div>
+        <div class="modal-body">
+            <div id="adminLoginBox">
+                <div class="input-wrap">
+                    <label>كلمة مرور الأدمن</label>
+                    <input type="password" id="adminPwd" placeholder="أدخل كلمة المرور" style="text-align:center; letter-spacing:1px;">
+                </div>
+                <button class="btn-main" onclick="adminAuth(1234)">دخول</button>
+                <div class="alert alert-error" id="adminErr" style="margin-top:14px;">❌ كلمة المرور خاطئة</div>
+            </div>
+
+            <div id="adminPanel" style="display:none;">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="switchAdminTab('files', this)">📁 رفع المادة العلمية</button>
+                    <button class="admin-tab" onclick="switchAdminTab('students', this)">👥 الطلاب</button>
+                    <button class="admin-tab" onclick="switchAdminTab('results', this)">📊 النتائج</button>
+                </div>
+
+                <div class="admin-section" id="admin-students">
+                    <h3 style="color:var(--primary); margin-bottom:14px; font-size:15px;">📋 قائمة الطلاب والحالة</h3>
+                    <div id="studentList"></div>
+                </div>
+
+                <div class="admin-section active" id="admin-files">
+                    <div style="background: linear-gradient(135deg, #e8eaf6, #c5cae9); border-radius: 14px; padding: 20px; margin-bottom: 20px; border-right: 5px solid var(--primary);">
+                        <h3 style="color:var(--primary); margin-bottom:8px; font-size:16px;">📚 مركز رفع المادة العلمية</h3>
+                        <p style="color: var(--text); font-size: 13px; line-height: 1.7;">
+                            من هنا يمكنك رفع جميع المواد العلمية بصيغة PDF للطلاب. اختر الفرقة المستهدفة ونوع المادة (كتاب / امتحان / ملحق)، ثم ارفع الملف مباشرة. 
+                            <br><strong style="color: var(--primary);">الملفات تظهر للطلاب فوراً في أقسامهم بعد الرفع.</strong>
+                        </p>
+                    </div>
+
+                    <div class="file-manager">
+                        <div class="upload-meta">
+                            <div class="input-wrap">
+                                <label>🎓 الفرقة المستهدفة</label>
+                                <select id="upGroup">
+                                    <option value="A1">الفرقة الأولى - آثار</option>
+                                    <option value="A2">الفرقة الثانية - آثار يونانى ورومانى</option>
+                                    <option value="A3">الفرقة الثالثة - آثار</option>
+                                    <option value="A4">الفرقة الرابعة - آثار</option>
+                                    <option value="ALL">جميع الفرق</option>
+                                </select>
+                            </div>
+                            <div class="input-wrap">
+                                <label>📂 نوع المادة العلمية</label>
+                                <select id="upType">
+                                    <option value="book">📖 كتاب دراسي (يظهر في تبويب الكتب)</option>
+                                    <option value="exam">📝 امتحان إلكتروني (يظهر في تبويب الامتحانات)</option>
+                                    <option value="extra">📎 ملحق إضافي (يظهر في تبويب الملحقات)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-wrap" style="margin-bottom:14px;">
+                            <label>✏️ عنوان المادة العلمية</label>
+                            <input type="text" id="upTitle" placeholder="مثال: مقدمة في علم الآثار - الفصل الأول">
+                        </div>
+                        <div class="upload-area" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                            <div class="upload-icon">📤</div>
+                            <p style="font-weight: 700; color: var(--primary); font-size: 15px;">انقر هنا أو اسحب ملف PDF</p>
+                            <small>الحد الأقصى: 50 ميجابايت · صيغة PDF فقط · الملف يُرفع مباشرة للطلاب</small>
+                            <input type="file" id="fileInput" accept=".pdf" onchange="handleFileSelect(this)">
+                        </div>
+                        <div class="progress-track" id="upProgress">
+                            <div class="progress-fill" id="upBar"></div>
+                        </div>
+
+                        <!-- ===== نموذج تعديل الملف ===== -->
+                        <div id="editFormBox" style="display:none; background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-radius: 14px; padding: 22px; margin: 20px 0; border-right: 5px solid var(--warning); animation: fadeUp 0.4s ease;">
+                            <h4 style="color: var(--warning); margin-bottom: 14px; font-size: 15px;">✏️ تعديل المادة العلمية</h4>
+                            <input type="hidden" id="editFileId">
+                            <div class="upload-meta">
+                                <div class="input-wrap">
+                                    <label>🎓 الفرقة المستهدفة</label>
+                                    <select id="editGroup">
+                                        <option value="A1">الفرقة الأولى - آثار</option>
+                                        <option value="A2">الفرقة الثانية - آثار يونانى ورومانى</option>
+                                        <option value="A3">الفرقة الثالثة - آثار</option>
+                                        <option value="A4">الفرقة الرابعة - آثار</option>
+                                        <option value="ALL">جميع الفرق</option>
+                                    </select>
+                                </div>
+                                <div class="input-wrap">
+                                    <label>📂 نوع المادة العلمية</label>
+                                    <select id="editType">
+                                        <option value="book">📖 كتاب دراسي</option>
+                                        <option value="exam">📝 امتحان إلكتروني</option>
+                                        <option value="extra">📎 ملحق إضافي</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-wrap" style="margin: 12px 0 16px;">
+                                <label>✏️ عنوان المادة العلمية</label>
+                                <input type="text" id="editTitle" placeholder="أدخل العنوان الجديد">
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-main" style="flex:1; margin-top:0; background: linear-gradient(135deg, var(--warning), #ffb74d);" onclick="saveEdit()">💾 حفظ التعديلات</button>
+                                <button class="btn-ghost" style="flex:1; padding: 15px;" onclick="cancelEdit()">❌ إلغاء</button>
+                            </div>
+                        </div>
+                        <!-- ===== نهاية نموذج التعديل ===== -->
+
+                        <div class="files-list" id="filesList">
+                            <h4 style="font-size: 16px;">📂 الملفات المرفوعة حالياً على المنصة</h4>
+                            <div id="filesContainer"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-section" id="admin-results">
+                    <h3 style="color:var(--primary); margin-bottom:14px; font-size:15px;">📊 نتائج الامتحانات</h3>
+                    <div id="resultsList"></div>
+                </div>
+
+                <button class="btn-close-modal" onclick="closeAdmin()">إغلاق اللوحة</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= LOCK SCREEN ================= -->
+<div class="lock-screen" id="lockScreen">
+    <div class="lock-icon">🔒</div>
+    <h2>تم إغلاق حسابك نهائياً</h2>
+    <p>لقد استنفدت جميع محاولات الدخول المسموحة<br>(تجربة أولى + 4 محاولات = 5 محاولات فاشلة).<br>يرجى التواصل مع الدكتور لإعادة تفعيل الحساب.</p>
+</div>
+
+<script>
+
+const GROUPS = {
+    "A1": { name: "الفرقة الأولى - آثار", count: 100 },
+    "A2": { name: "الفرقة الثانية - آثار يونانى ورومانى", count: 70 },
+    "A3": { name: "الفرقة الثالثة - آثار", count: 70 },
+    "A4": { name: "الفرقة الرابعة - آثار", count: 70 }
+};
+
+// Valid passwords database (from Excel file)
+const PASSWORDS = {
+    "A1K3PZ47": { group: "A1", sid: 1 },
+    "A1P7J9ZN": { group: "A1", sid: 2 },
+    "A1FE4GNZ": { group: "A1", sid: 3 },
+    "A1NRHWP8": { group: "A1", sid: 4 },
+    "A1W62NXH": { group: "A1", sid: 5 },
+    "A1WDAPFQ": { group: "A1", sid: 6 },
+    "A16AGY4G": { group: "A1", sid: 7 },
+    "A1DXTTPM": { group: "A1", sid: 8 },
+    "A17V5AC2": { group: "A1", sid: 9 },
+    "A1UY76W8": { group: "A1", sid: 10 },
+    "A1AVK7RW": { group: "A1", sid: 11 },
+    "A1M48BCL": { group: "A1", sid: 12 },
+    "A1FN8UP7": { group: "A1", sid: 13 },
+    "A1MFV7CF": { group: "A1", sid: 14 },
+    "A1KN4TVH": { group: "A1", sid: 15 },
+    "A12PK8X2": { group: "A1", sid: 16 },
+    "A1MEAM98": { group: "A1", sid: 17 },
+    "A16DVBY9": { group: "A1", sid: 18 },
+    "A1GTMMYQ": { group: "A1", sid: 19 },
+    "A1YA5JYN": { group: "A1", sid: 20 },
+    "A1PN3FJJ": { group: "A1", sid: 21 },
+    "A1MBR52X": { group: "A1", sid: 22 },
+    "A17WH5H5": { group: "A1", sid: 23 },
+    "A1N85T6M": { group: "A1", sid: 24 },
+    "A16DTKMD": { group: "A1", sid: 25 },
+    "A1CYFQBA": { group: "A1", sid: 26 },
+    "A13ASSYC": { group: "A1", sid: 27 },
+    "A1DVJ9BS": { group: "A1", sid: 28 },
+    "A1DQTEG5": { group: "A1", sid: 29 },
+    "A15SE7CD": { group: "A1", sid: 30 },
+    "A1Q8QQDE": { group: "A1", sid: 31 },
+    "A12YWKSP": { group: "A1", sid: 32 },
+    "A17F9FSL": { group: "A1", sid: 33 },
+    "A1NVQJXX": { group: "A1", sid: 34 },
+    "A1GRV3ZH": { group: "A1", sid: 35 },
+    "A1SJFXLA": { group: "A1", sid: 36 },
+    "A1QBJMKK": { group: "A1", sid: 37 },
+    "A1P6AFPC": { group: "A1", sid: 38 },
+    "A1ZH3PNU": { group: "A1", sid: 39 },
+    "A1UJWXH3": { group: "A1", sid: 40 },
+    "A1Z9CBG7": { group: "A1", sid: 41 },
+    "A14ZH667": { group: "A1", sid: 42 },
+    "A1ENR2ZH": { group: "A1", sid: 43 },
+    "A142Q6CN": { group: "A1", sid: 44 },
+    "A1C44UXE": { group: "A1", sid: 45 },
+    "A1AN44LU": { group: "A1", sid: 46 },
+    "A1CUYYLF": { group: "A1", sid: 47 },
+    "A15NTLLT": { group: "A1", sid: 48 },
+    "A14HQYLE": { group: "A1", sid: 49 },
+    "A1H59ZNK": { group: "A1", sid: 50 },
+    "A1UB7P4M": { group: "A1", sid: 51 },
+    "A175ZDQ9": { group: "A1", sid: 52 },
+    "A15A6QSX": { group: "A1", sid: 53 },
+    "A1SW3CVR": { group: "A1", sid: 54 },
+    "A1A8ZKWY": { group: "A1", sid: 55 },
+    "A1L3B2DF": { group: "A1", sid: 56 },
+    "A1HPSSRZ": { group: "A1", sid: 57 },
+    "A1Y7N8P9": { group: "A1", sid: 58 },
+    "A19X6RZX": { group: "A1", sid: 59 },
+    "A1CY4QDE": { group: "A1", sid: 60 },
+    "A1ELG6AQ": { group: "A1", sid: 61 },
+    "A155B76M": { group: "A1", sid: 62 },
+    "A1BK7AXD": { group: "A1", sid: 63 },
+    "A1Y8TVSE": { group: "A1", sid: 64 },
+    "A1ZE5UKC": { group: "A1", sid: 65 },
+    "A1KY42X7": { group: "A1", sid: 66 },
+    "A1VTEK8W": { group: "A1", sid: 67 },
+    "A1ZC8QKB": { group: "A1", sid: 68 },
+    "A15GVZP3": { group: "A1", sid: 69 },
+    "A1JZ8CGX": { group: "A1", sid: 70 },
+    "A1CD3UM4": { group: "A1", sid: 71 },
+    "A1E25YAY": { group: "A1", sid: 72 },
+    "A1FB7VVZ": { group: "A1", sid: 73 },
+    "A1VG22R2": { group: "A1", sid: 74 },
+    "A1CHXHVW": { group: "A1", sid: 75 },
+    "A19FKCYZ": { group: "A1", sid: 76 },
+    "A1KYMCYS": { group: "A1", sid: 77 },
+    "A1WR6M9B": { group: "A1", sid: 78 },
+    "A1BAGNQW": { group: "A1", sid: 79 },
+    "A15R96V3": { group: "A1", sid: 80 },
+    "A1ANGEY2": { group: "A1", sid: 81 },
+    "A1GGDGVD": { group: "A1", sid: 82 },
+    "A1CL2PXU": { group: "A1", sid: 83 },
+    "A12FF62T": { group: "A1", sid: 84 },
+    "A1FUUQNC": { group: "A1", sid: 85 },
+    "A15WVDL3": { group: "A1", sid: 86 },
+    "A17DAPKQ": { group: "A1", sid: 87 },
+    "A1GHPVQS": { group: "A1", sid: 88 },
+    "A1ENNBKG": { group: "A1", sid: 89 },
+    "A12N7SWE": { group: "A1", sid: 90 },
+    "A1KQG22K": { group: "A1", sid: 91 },
+    "A1GF49FG": { group: "A1", sid: 92 },
+    "A1FE829P": { group: "A1", sid: 93 },
+    "A1YMMDFS": { group: "A1", sid: 94 },
+    "A1MSG9M9": { group: "A1", sid: 95 },
+    "A148KF7E": { group: "A1", sid: 96 },
+    "A1DZBXAL": { group: "A1", sid: 97 },
+    "A1EUPQ55": { group: "A1", sid: 98 },
+    "A1C6U4VD": { group: "A1", sid: 99 },
+    "A1KAXN98": { group: "A1", sid: 100 },
+    "A243CU38": { group: "A2", sid: 1 },
+    "A2JXG745": { group: "A2", sid: 2 },
+    "A2ZN289Y": { group: "A2", sid: 3 },
+    "A2AGAYLH": { group: "A2", sid: 4 },
+    "A2R2T3X9": { group: "A2", sid: 5 },
+    "A2H5ZZB8": { group: "A2", sid: 6 },
+    "A2H46736": { group: "A2", sid: 7 },
+    "A2YMF2WJ": { group: "A2", sid: 8 },
+    "A2VAJN6T": { group: "A2", sid: 9 },
+    "A23BD47Y": { group: "A2", sid: 10 },
+    "A2M2RAK9": { group: "A2", sid: 11 },
+    "A2TLW9P3": { group: "A2", sid: 12 },
+    "A2PCKFJ7": { group: "A2", sid: 13 },
+    "A2HZQEBW": { group: "A2", sid: 14 },
+    "A2CFAT8J": { group: "A2", sid: 15 },
+    "A2LX765M": { group: "A2", sid: 16 },
+    "A2NJX2JG": { group: "A2", sid: 17 },
+    "A2GHCXDG": { group: "A2", sid: 18 },
+    "A2GPU986": { group: "A2", sid: 19 },
+    "A2PC89FW": { group: "A2", sid: 20 },
+    "A2THYFKF": { group: "A2", sid: 21 },
+    "A2H9UCFJ": { group: "A2", sid: 22 },
+    "A26TZ9MP": { group: "A2", sid: 23 },
+    "A2TXF2NU": { group: "A2", sid: 24 },
+    "A2ZRPCX2": { group: "A2", sid: 25 },
+    "A27PUAB7": { group: "A2", sid: 26 },
+    "A2L6ZUEN": { group: "A2", sid: 27 },
+    "A2XV4ZUU": { group: "A2", sid: 28 },
+    "A2EBMJQZ": { group: "A2", sid: 29 },
+    "A2XNC8RY": { group: "A2", sid: 30 },
+    "A25CEL6A": { group: "A2", sid: 31 },
+    "A2D8UR3Q": { group: "A2", sid: 32 },
+    "A2RQVYU3": { group: "A2", sid: 33 },
+    "A25XDG9E": { group: "A2", sid: 34 },
+    "A28JWLES": { group: "A2", sid: 35 },
+    "A2NX2RTR": { group: "A2", sid: 36 },
+    "A244Q6HP": { group: "A2", sid: 37 },
+    "A289JACC": { group: "A2", sid: 38 },
+    "A23K9L4C": { group: "A2", sid: 39 },
+    "A2LGYTNY": { group: "A2", sid: 40 },
+    "A2WQNPPN": { group: "A2", sid: 41 },
+    "A24GYPQA": { group: "A2", sid: 42 },
+    "A23FWVNS": { group: "A2", sid: 43 },
+    "A2YSZV38": { group: "A2", sid: 44 },
+    "A2JBDGKF": { group: "A2", sid: 45 },
+    "A2XEZFK5": { group: "A2", sid: 46 },
+    "A2LDAFJ9": { group: "A2", sid: 47 },
+    "A26MEDQB": { group: "A2", sid: 48 },
+    "A2D9R69V": { group: "A2", sid: 49 },
+    "A22YMMWS": { group: "A2", sid: 50 },
+    "A2SGTLTK": { group: "A2", sid: 51 },
+    "A2AT2LKS": { group: "A2", sid: 52 },
+    "A28M3HVL": { group: "A2", sid: 53 },
+    "A246R4FG": { group: "A2", sid: 54 },
+    "A2LFA7GC": { group: "A2", sid: 55 },
+    "A2M73L5H": { group: "A2", sid: 56 },
+    "A2CFTXLZ": { group: "A2", sid: 57 },
+    "A2QA8JTB": { group: "A2", sid: 58 },
+    "A2AYYE74": { group: "A2", sid: 59 },
+    "A2BN7LF5": { group: "A2", sid: 60 },
+    "A25R8FJS": { group: "A2", sid: 61 },
+    "A2MHH4FK": { group: "A2", sid: 62 },
+    "A2F5LZBG": { group: "A2", sid: 63 },
+    "A2DV2UZJ": { group: "A2", sid: 64 },
+    "A2RXN526": { group: "A2", sid: 65 },
+    "A2TB6FU4": { group: "A2", sid: 66 },
+    "A2BYNMAU": { group: "A2", sid: 67 },
+    "A2VKAK4C": { group: "A2", sid: 68 },
+    "A2Z7TV7M": { group: "A2", sid: 69 },
+    "A2V3S434": { group: "A2", sid: 70 },
+    "A37ECTSZ": { group: "A3", sid: 1 },
+    "A3CXYE9G": { group: "A3", sid: 2 },
+    "A3K9WYHG": { group: "A3", sid: 3 },
+    "A38M7Q8N": { group: "A3", sid: 4 },
+    "A3H883T5": { group: "A3", sid: 5 },
+    "A3B22X2E": { group: "A3", sid: 6 },
+    "A3766XU9": { group: "A3", sid: 7 },
+    "A3M24SNY": { group: "A3", sid: 8 },
+    "A36LRV3S": { group: "A3", sid: 9 },
+    "A386P9D2": { group: "A3", sid: 10 },
+    "A3G3KTDM": { group: "A3", sid: 11 },
+    "A3YLWS9Y": { group: "A3", sid: 12 },
+    "A3BH56MZ": { group: "A3", sid: 13 },
+    "A3Q3JWGR": { group: "A3", sid: 14 },
+    "A3S2W4BV": { group: "A3", sid: 15 },
+    "A356BVE9": { group: "A3", sid: 16 },
+    "A3SARFCA": { group: "A3", sid: 17 },
+    "A3CNVPDH": { group: "A3", sid: 18 },
+    "A3E5EUKG": { group: "A3", sid: 19 },
+    "A3CT4N68": { group: "A3", sid: 20 },
+    "A3VPLRRS": { group: "A3", sid: 21 },
+    "A3JG67X4": { group: "A3", sid: 22 },
+    "A3Q5SNQM": { group: "A3", sid: 23 },
+    "A32VS3HD": { group: "A3", sid: 24 },
+    "A3UADETT": { group: "A3", sid: 25 },
+    "A3C73LDD": { group: "A3", sid: 26 },
+    "A3N52DLB": { group: "A3", sid: 27 },
+    "A3BUVZJF": { group: "A3", sid: 28 },
+    "A3PM2TPS": { group: "A3", sid: 29 },
+    "A395XBTY": { group: "A3", sid: 30 },
+    "A3PLGXNV": { group: "A3", sid: 31 },
+    "A3PEUWWL": { group: "A3", sid: 32 },
+    "A3KEPZ7A": { group: "A3", sid: 33 },
+    "A3KMW4DL": { group: "A3", sid: 34 },
+    "A36TF66R": { group: "A3", sid: 35 },
+    "A3JQASU4": { group: "A3", sid: 36 },
+    "A36UC8KN": { group: "A3", sid: 37 },
+    "A3RG2HTC": { group: "A3", sid: 38 },
+    "A39UUPCJ": { group: "A3", sid: 39 },
+    "A33VMJ4Z": { group: "A3", sid: 40 },
+    "A36UZRZH": { group: "A3", sid: 41 },
+    "A3XJFAN4": { group: "A3", sid: 42 },
+    "A394Y2MG": { group: "A3", sid: 43 },
+    "A3KG55P6": { group: "A3", sid: 44 },
+    "A3NB8YUA": { group: "A3", sid: 45 },
+    "A3K52VJS": { group: "A3", sid: 46 },
+    "A34L64DE": { group: "A3", sid: 47 },
+    "A3TJ9TM7": { group: "A3", sid: 48 },
+    "A3PMAHGH": { group: "A3", sid: 49 },
+    "A374UWEY": { group: "A3", sid: 50 },
+    "A3T23LWH": { group: "A3", sid: 51 },
+    "A353YE85": { group: "A3", sid: 52 },
+    "A3FFYX8Q": { group: "A3", sid: 53 },
+    "A3RVNZMS": { group: "A3", sid: 54 },
+    "A3AWMST4": { group: "A3", sid: 55 },
+    "A33WNE4L": { group: "A3", sid: 56 },
+    "A3HHCRGY": { group: "A3", sid: 57 },
+    "A3Y4DZEN": { group: "A3", sid: 58 },
+    "A36HBN4F": { group: "A3", sid: 59 },
+    "A323BUPF": { group: "A3", sid: 60 },
+    "A39ML982": { group: "A3", sid: 61 },
+    "A3ZZG9S7": { group: "A3", sid: 62 },
+    "A3K6HM8X": { group: "A3", sid: 63 },
+    "A3CZ3SB3": { group: "A3", sid: 64 },
+    "A3Y2CVFL": { group: "A3", sid: 65 },
+    "A39FJBA8": { group: "A3", sid: 66 },
+    "A3B82UT6": { group: "A3", sid: 67 },
+    "A3CALF2Q": { group: "A3", sid: 68 },
+    "A3J4V5LX": { group: "A3", sid: 69 },
+    "A3Y4GRHG": { group: "A3", sid: 70 },
+    "A46TA7GT": { group: "A4", sid: 1 },
+    "A4KWHJJL": { group: "A4", sid: 2 },
+    "A4ZJLG3K": { group: "A4", sid: 3 },
+    "A4BVMVBQ": { group: "A4", sid: 4 },
+    "A435FK3L": { group: "A4", sid: 5 },
+    "A49HT65M": { group: "A4", sid: 6 },
+    "A47F7CYY": { group: "A4", sid: 7 },
+    "A4QZTHJX": { group: "A4", sid: 8 },
+    "A4FEEUK5": { group: "A4", sid: 9 },
+    "A4YQP7FP": { group: "A4", sid: 10 },
+    "A4SHXK76": { group: "A4", sid: 11 },
+    "A4SHHYAN": { group: "A4", sid: 12 },
+    "A4PDYZDY": { group: "A4", sid: 13 },
+    "A4M3V6JZ": { group: "A4", sid: 14 },
+    "A4AZHR6F": { group: "A4", sid: 15 },
+    "A4XQKBRA": { group: "A4", sid: 16 },
+    "A4KAWTBU": { group: "A4", sid: 17 },
+    "A47MDQZ6": { group: "A4", sid: 18 },
+    "A45NQAK5": { group: "A4", sid: 19 },
+    "A43JZMJB": { group: "A4", sid: 20 },
+    "A4Z62N5C": { group: "A4", sid: 21 },
+    "A4FCJJQF": { group: "A4", sid: 22 },
+    "A4R9W6CH": { group: "A4", sid: 23 },
+    "A4BRYV29": { group: "A4", sid: 24 },
+    "A45FVZZU": { group: "A4", sid: 25 },
+    "A4FDKVG7": { group: "A4", sid: 26 },
+    "A4ZSBU3V": { group: "A4", sid: 27 },
+    "A4ZDVEHW": { group: "A4", sid: 28 },
+    "A4R4KAWN": { group: "A4", sid: 29 },
+    "A4RKK9M3": { group: "A4", sid: 30 },
+    "A4P66VE7": { group: "A4", sid: 31 },
+    "A4X4SSB9": { group: "A4", sid: 32 },
+    "A4XVQVJ9": { group: "A4", sid: 33 },
+    "A44QDTUF": { group: "A4", sid: 34 },
+    "A46RMFRZ": { group: "A4", sid: 35 },
+    "A49AFBRW": { group: "A4", sid: 36 },
+    "A4UV8LFR": { group: "A4", sid: 37 },
+    "A49KB9EQ": { group: "A4", sid: 38 },
+    "A4K4GJAP": { group: "A4", sid: 39 },
+    "A45DCKMF": { group: "A4", sid: 40 },
+    "A4NKT6PV": { group: "A4", sid: 41 },
+    "A4URRXT2": { group: "A4", sid: 42 },
+    "A4VSR6YW": { group: "A4", sid: 43 },
+    "A4ULXFRD": { group: "A4", sid: 44 },
+    "A4LNSGTY": { group: "A4", sid: 45 },
+    "A4RGQXCN": { group: "A4", sid: 46 },
+    "A4JWQGWV": { group: "A4", sid: 47 },
+    "A4BECC7W": { group: "A4", sid: 48 },
+    "A4KR78ZU": { group: "A4", sid: 49 },
+    "A42EY6WQ": { group: "A4", sid: 50 },
+    "A4K4DKFQ": { group: "A4", sid: 51 },
+    "A4C94UC7": { group: "A4", sid: 52 },
+    "A48X8XEK": { group: "A4", sid: 53 },
+    "A44YDWXW": { group: "A4", sid: 54 },
+    "A4XY5XRJ": { group: "A4", sid: 55 },
+    "A4PN9JQL": { group: "A4", sid: 56 },
+    "A4VYH8EN": { group: "A4", sid: 57 },
+    "A4QFXPQN": { group: "A4", sid: 58 },
+    "A4X2YQAL": { group: "A4", sid: 59 },
+    "A494JR5V": { group: "A4", sid: 60 },
+    "A4D25N9F": { group: "A4", sid: 61 },
+    "A4DLM6M2": { group: "A4", sid: 62 },
+    "A4QATBE5": { group: "A4", sid: 63 },
+    "A4PARGBL": { group: "A4", sid: 64 },
+    "A4LZVJSN": { group: "A4", sid: 65 },
+    "A44399YW": { group: "A4", sid: 66 },
+    "A4YP5VAA": { group: "A4", sid: 67 },
+    "A4E3SDU8": { group: "A4", sid: 68 },
+    "A4BVFYJZ": { group: "A4", sid: 69 },
+    "A4ZDNKW4": { group: "A4", sid: 70 }
+};
+const BOOKS = {
+    "A1": [],
+    "A2": [],
+    "A3": [],
+    "A4": []
+};
+
+const EXAMS = {
+    "A1": [{
+        title: "اختبار منتصف الترم - مقدمة في علم الآثار",
+        qs: [
+            {q:"ما هو تعريف علم الآثار؟", o:["دراسة الحضارات القديمة مادياً","حفر القبور فقط","جمع التحف القديمة","السياحة الأثرية"], c:0},
+            {q:"أي من التالي ليس من فروع علم الآثار؟", o:["الآثار المصرية","الآثار الإسلامية","الآثار الحديثة","الآثار اليونانية"], c:2},
+            {q:"متى بدأ علم الآثار كعلم منظم؟", o:["القرن 15 م","القرن 18 م","القرن 19 م","القرن 20 م"], c:2}
+        ]
+    }],
+    "A2": [{
+        title: "اختبار منتصف الترم - الآثار اليونانية",
+        qs: [
+            {q:"ما هي أهم مدينة يونانية أثرية؟", o:["روما","أثينا","الإسكندرية","بيروت"], c:1},
+            {q:"العمارة اليونانية تتميز بـ:", o:["الأقواس الكبيرة","الأعمدة الدورية","القباب","الأبراج"], c:1}
+        ]
+    }],
+    "A3": [{
+        title: "اختبار منتصف الترم - العصر البطلمي",
+        qs: [
+            {q:"من هو مؤسس الدولة البطلمية في مصر؟", o:["الإسكندر الأكبر","بطليموس الأول سوتر","يوليوس قيصر","رمسيس الثاني"], c:1}
+        ]
+    }],
+    "A4": [{
+        title: "اختبار منتصف الترم - العمارة الإسلامية",
+        qs: [
+            {q:"ما هو أقدم مسجد قائم في مصر؟", o:["مسجد عمرو بن العاص","مسجد الأزهر","مسجد محمد علي","مسجد ابن طولون"], c:0}
+        ]
+    }]
+};
+
+const EXTRAS = [
+    {icon:"📅", t:"جدول المحاضرات", d:"PDF · 2 صفحات", id:"sch"},
+    {icon:"📋", t:"نموذج إجابة الامتحان", d:"PDF · 1 صفحة", id:"ans"},
+    {icon:"🗺️", t:"خريطة المواقع الأثرية", d:"PDF · 3 صفحات", id:"map"},
+    {icon:"📚", t:"قائمة المراجع العلمية", d:"PDF · 2 صفحات", id:"ref"}
+];
+
+let currentStudent = null;
+const MAX_ATTEMPTS = 5;
+
+function doLogin() {
+    const name = document.getElementById('inName').value.trim();
+    const stuNum = document.getElementById('inStuNum').value.trim();
+    const group = document.getElementById('inGroup').value;
+    const pwd  = document.getElementById('inPwd').value.trim().toUpperCase();
+    const err  = document.getElementById('errBox');
+    const warn = document.getElementById('warnBox');
+    const succ = document.getElementById('succBox');
+
+    [err, warn, succ].forEach(el => el.style.display = 'none');
+
+    if(!name || !stuNum || !group || !pwd){
+        err.innerHTML = "❌ الرجاء إدخال جميع البيانات";
+        show(err); return;
+    }
+
+    // العداد مرتبط برقم الطالب + الفرقة (وليس بالباسوورد)
+    const attemptKey = 'att_' + group + '_' + stuNum;
+    let used = parseInt(localStorage.getItem(attemptKey) || '0');
+
+    // التحقق من وجود القفل
+    if(used >= MAX_ATTEMPTS){
+        document.getElementById('lockScreen').style.display = 'flex';
+        return;
+    }
+
+    // Validate password exists and matches group
+    const pwdInfo = PASSWORDS[pwd];
+    if(!pwdInfo){
+        handleFailedAttempt(attemptKey, used, err, warn, "❌ كلمة المرور غير صحيحة");
+        return;
+    }
+
+    if(pwdInfo.group !== group){
+        handleFailedAttempt(attemptKey, used, err, warn, "❌ كلمة المرور لا تتطابق مع الفرقة المختارة");
+        return;
+    }
+
+    // نجاح — الدخول مباشرة بدون استنزاف محاولة
+    succ.innerHTML = "✓ جاري الدخول...";
+    show(succ);
+    setTimeout(() => enterApp(name, stuNum, group, pwdInfo), 800);
+}
+
+function handleFailedAttempt(key, used, errBox, warnBox, msg) {
+    used++;
+    localStorage.setItem(key, String(used));
+
+    errBox.innerHTML = msg;
+    show(errBox);
+
+    const left = MAX_ATTEMPTS - used;
+    if(used === 1){
+        // المحاولة الأولى (التجربة)
+        warnBox.innerHTML = `⚠️ تجربة أولى. تبقت ${left} محاول${left===1?'ة':'ات'} فقط!`;
+        show(warnBox);
+    } else if(left > 0){
+        warnBox.innerHTML = `⚠️ تبقت ${left} محاول${left===1?'ة':'ات'} فقط!`;
+        show(warnBox);
+    } else if(used === MAX_ATTEMPTS){
+        warnBox.innerHTML = `⚠️ هذه آخر محاولة! سيتم قفل الحساب بعدها.`;
+        show(warnBox);
+    } else {
+        // used > MAX_ATTEMPTS — القفل الفوري
+        document.getElementById('lockScreen').style.display = 'flex';
+    }
+}
+
+function enterApp(name, stuNum, group, pwdInfo) {
+    currentStudent = { name: name, stuNum: stuNum, group: group, sid: pwdInfo.sid, pwd: document.getElementById('inPwd').value.trim().toUpperCase() };
+
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+
+    document.getElementById('groupName').textContent = GROUPS[group].name;
+    document.getElementById('studentPill').textContent = `رقم الطالب: ${stuNum}`;
+    document.getElementById('welcomeName').textContent = `أهلاً، ${name}`;
+    document.getElementById('welcomeGroup').textContent = `${GROUPS[group].name} · رقم الطالب: ${stuNum}`;
+
+    renderBooks(group);
+    renderExams(group);
+    renderExtras();
+
+    document.getElementById('statBooks').textContent = getUploadedFiles(group, 'book').length;
+    document.getElementById('statExams').textContent = (EXAMS[group]||[]).length;
+    document.getElementById('statFiles').textContent = EXTRAS.length;
+}
+
+function show(el){ el.style.display = 'flex'; }
+
+function renderBooks(g) {
+    const grid = document.getElementById('booksGrid');
+    const uploaded = getUploadedFiles(g, 'book');
+
+    if(uploaded.length === 0) {
+        grid.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:40px;font-size:15px;">📚 لا توجد كتب دراسية مرفوعة بعد.<br>سيتم إضافة الكتب قريباً من قبل الدكتور.</p>';
+        return;
+    }
+
+    grid.innerHTML = uploaded.map((b,i) => `
+        <div class="book">
+            <div class="book-cover">📖</div>
+            <h4>${b.t}</h4>
+            <div class="book-meta">${b.a || 'ملف مرفوع'} · ${b.p || 'PDF'}</div>
+            <button class="btn-green" onclick="dlBook('${b.id}','${b.t}', true)">
+                ⬇️ تحميل PDF
+            </button>
+        </div>
+    `).join('');
+}
+
+function renderExams(g) {
+    const wrap = document.getElementById('examsWrap');
+    const list = EXAMS[g] || [];
+    if(!list.length){ wrap.innerHTML='<p style="text-align:center;color:var(--text-light);padding:40px;">لا توجد امتحانات متاحة حالياً</p>'; return; }
+    wrap.innerHTML = list.map((ex, ei) => `
+        <div class="exam-box">
+            <div class="exam-top">
+                <h3>${ex.title}</h3>
+                <span class="tag tag-open">متاح الآن</span>
+            </div>
+            <div id="examBody_${ei}">
+                ${ex.qs.map((q, qi) => `
+                    <div class="question">
+                        <p>${qi+1}. ${q.q}</p>
+                        <div class="opts">
+                            ${q.o.map((opt, oi) => `
+                                <label class="opt">
+                                    <input type="radio" name="e${ei}_q${qi}" value="${oi}">
+                                    <span>${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+                <button class="btn-dark" onclick="submitExam('${g}',${ei})">تسليم الاختبار ✓</button>
+            </div>
+            <div class="result-panel" id="res_${ei}">
+                <div class="big-score" id="score_${ei}">0</div>
+                <div class="result-label">درجتك من 10</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderExtras() {
+    document.getElementById('extraGrid').innerHTML = EXTRAS.map(e => `
+        <div class="material-card">
+            <div class="mat-icon">${e.icon}</div>
+            <h4 style="margin-bottom:5px;">${e.t}</h4>
+            <p style="color:var(--text-light);font-size:12px;margin-bottom:14px;">${e.d}</p>
+            <button class="btn-green" onclick="dlExtra('${e.id}')">⬇️ تحميل</button>
+        </div>
+    `).join('');
+}
+
+function switchTab(tab, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-'+tab).classList.add('active');
+}
+
+function dlBook(id, title, isUploaded) {
+    if(isUploaded) {
+        const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+        const file = files.find(f => f.id === id);
+        if(file && file.data) {
+            const link = document.createElement('a');
+            link.href = file.data;
+            link.download = file.filename || `${id}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            return;
+        }
+    }
+    const blob = new Blob([`كتاب: ${title}
+====================
+
+هذا ملف تجريبي.
+في النظام الفعلي، يتم تحميل ملف PDF حقيقي من السيرفر.
+
+© قسم الآثار - كلية الآداب`], {type:'application/pdf'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${id}.pdf`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function dlExtra(id) {
+    alert('جاري تحميل الملف...');
+}
+
+function submitExam(g, ei) {
+    const ex = EXAMS[g][ei];
+    let correct = 0;
+    ex.qs.forEach((q, qi) => {
+        const sel = document.querySelector(`input[name="e${ei}_q${qi}"]:checked`);
+        if(sel && parseInt(sel.value) === q.c) correct++;
+    });
+    const score = Math.round((correct / ex.qs.length) * 10);
+    document.getElementById(`score_${ei}`).textContent = score;
+    document.getElementById(`res_${ei}`).classList.add('show');
+    const all = JSON.parse(localStorage.getItem('results') || '[]');
+    all.push({
+        user: currentStudent ? currentStudent.stuNum : 'unknown',
+        name: currentStudent ? currentStudent.name : 'unknown',
+        exam: ex.title,
+        score: score,
+        date: new Date().toLocaleString('ar-EG')
+    });
+    localStorage.setItem('results', JSON.stringify(all));
+}
+
+function doLogout() {
+    currentStudent = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('inName').value = '';
+    document.getElementById('inStuNum').value = '';
+    document.getElementById('inGroup').value = '';
+    document.getElementById('inPwd').value = '';
+    document.querySelectorAll('.alert').forEach(el => el.style.display = 'none');
+}
+
+function openAdmin() {
+    document.getElementById('adminModal').style.display = 'flex';
+    document.getElementById('adminLoginBox').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('adminPwd').value = '';
+    document.getElementById('adminErr').style.display = 'none';
+}
+
+function adminAuth() {
+    const p = document.getElementById('adminPwd').value;
+    if(p === 'admin123' || p === 'دكتور'){
+        // Close modal and open full doctor dashboard
+        document.getElementById('adminModal').style.display = 'none';
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('doctorApp').style.display = 'block';
+        initDoctorDashboard();
+    } else {
+        document.getElementById('adminErr').style.display = 'flex';
+    }
+}
+
+// ===== DOCTOR DASHBOARD =====
+let selectedDocFile = null;
+
+function initDoctorDashboard() {
+    updateDocStats();
+    renderDocFilesList();
+    renderDocStudentList();
+    renderDocResultsList();
+}
+
+function updateDocStats() {
+    const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+    const results = JSON.parse(localStorage.getItem('results') || '[]');
+    const totalEl = document.getElementById('docStatTotal');
+    const resEl = document.getElementById('docStatResults');
+    if(totalEl) totalEl.textContent = files.length;
+    if(resEl) resEl.textContent = results.length;
+}
+
+function switchDocTab(tab, btn) {
+    document.querySelectorAll('.doc-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.doc-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('doc-'+tab).classList.add('active');
+    if(tab === 'files') renderDocFilesList();
+    if(tab === 'students') renderDocStudentList();
+    if(tab === 'results') renderDocResultsList();
+}
+
+function docHandleFile(input) {
+    const file = input.files[0];
+    if(!file) return;
+    if(file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+        alert('❌ يرجى اختيار ملف PDF فقط!');
+        return;
+    }
+    if(file.size > 50 * 1024 * 1024) {
+        alert('❌ حجم الملف يتجاوز 50 ميجابايت!');
+        input.value = '';
+        return;
+    }
+    selectedDocFile = file;
+    document.getElementById('docPreviewName').textContent = file.name;
+    document.getElementById('docPreviewSize').textContent = (file.size/1024/1024).toFixed(2) + ' MB · جاهز للرفع ✓';
+    document.getElementById('docFilePreview').classList.add('show');
+    document.getElementById('docDropZone').style.borderColor = 'var(--success)';
+    document.getElementById('docDropZone').style.background = '#f0fff4';
+    document.getElementById('btnDocUpload').disabled = false;
+    if(!document.getElementById('docUpTitle').value.trim()) {
+        document.getElementById('docUpTitle').value = file.name.replace('.pdf','');
+    }
+}
+
+function docUploadFile() {
+    if(!selectedDocFile) { alert('❌ الرجاء اختيار ملف PDF أولاً'); return; }
+    const title = document.getElementById('docUpTitle').value.trim();
+    if(!title) { alert('❌ الرجاء إدخال عنوان للمادة العلمية'); document.getElementById('docUpTitle').focus(); return; }
+
+    const group = document.getElementById('docUpGroup').value;
+    const type  = document.getElementById('docUpType').value;
+    const tag   = document.getElementById('docUpTag').value.trim();
+
+    const progress = document.getElementById('docProgress');
+    const bar = document.getElementById('docProgressBar');
+    const btn = document.getElementById('btnDocUpload');
+    progress.classList.add('show');
+    bar.style.width = '0%';
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري الرفع...';
+
+    const reader = new FileReader();
+    reader.onprogress = (e) => {
+        if(e.lengthComputable) bar.style.width = Math.round((e.loaded/e.total)*90) + '%';
+    };
+    reader.onload = (e) => {
+        bar.style.width = '100%';
+        setTimeout(() => {
+            const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+            files.push({
+                id: 'up_' + Date.now(),
+                title: title,
+                filename: selectedDocFile.name,
+                group: group,
+                type: type,
+                tag: tag,
+                size: (selectedDocFile.size/1024/1024).toFixed(2) + ' MB',
+                date: new Date().toLocaleString('ar-EG'),
+                data: e.target.result,
+                isUploaded: true
+            });
+            localStorage.setItem('uploadedFiles', JSON.stringify(files));
+
+            // Reset form
+            document.getElementById('docUpTitle').value = '';
+            document.getElementById('docUpTag').value = '';
+            document.getElementById('docFileInput').value = '';
+            document.getElementById('docFilePreview').classList.remove('show');
+            document.getElementById('docDropZone').style.borderColor = '#c5cae9';
+            document.getElementById('docDropZone').style.background = '#fafbff';
+            progress.classList.remove('show');
+            bar.style.width = '0%';
+            btn.disabled = false;
+            btn.innerHTML = '📤 رفع الملف الآن';
+            selectedDocFile = null;
+            updateDocStats();
+
+            // Success toast
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;top:24px;right:24px;background:#43a047;color:white;padding:16px 24px;border-radius:14px;font-family:Cairo,sans-serif;font-weight:700;font-size:14px;z-index:9999;box-shadow:0 8px 25px rgba(0,0,0,0.2);animation:fadeUp 0.4s ease;';
+            toast.innerHTML = '✓ تم رفع الملف بنجاح! وهو الآن متاح للطلاب';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }, 400);
+    };
+    reader.readAsDataURL(selectedDocFile);
+}
+
+function renderDocFilesList() {
+    const container = document.getElementById('docFilesGrid');
+    if(!container) return;
+    let files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+
+    const fg = document.getElementById('filterGroup')?.value || 'ALL';
+    const ft = document.getElementById('filterType')?.value || 'ALL';
+    if(fg !== 'ALL') files = files.filter(f => f.group === fg || f.group === 'ALL');
+    if(ft !== 'ALL') files = files.filter(f => f.type === ft);
+
+    if(files.length === 0) {
+        container.innerHTML = `<div class="empty-files"><div class="empty-icon">📭</div><h4>لا توجد ملفات مرفوعة بعد</h4><p style="color:var(--text-light);font-size:13px;">اذهب إلى تبويب "رفع مادة علمية" لرفع أول ملف PDF</p></div>`;
+        return;
+    }
+
+    const typeLabel = {book:'📖 كتاب دراسي', exam:'📝 امتحان', extra:'📎 ملحق'};
+    const groupLabel = {A1:'الفرقة الأولى', A2:'الفرقة الثانية', A3:'الفرقة الثالثة', A4:'الفرقة الرابعة', ALL:'جميع الفرق'};
+
+    container.innerHTML = `<div class="files-grid">` + files.map(f => `
+        <div class="doc-file-card">
+            <div class="doc-file-left">
+                <div class="doc-file-pdf-icon ${f.type}">${f.type==='book'?'📖':f.type==='exam'?'📝':'📎'}</div>
+                <div>
+                    <div class="doc-file-name">${f.title}</div>
+                    <div class="doc-file-meta">
+                        <span>📁 ${f.filename}</span>
+                        <span>💾 ${f.size}</span>
+                        <span>🎓 ${groupLabel[f.group]||f.group}</span>
+                        <span>${typeLabel[f.type]||f.type}</span>
+                        ${f.tag?`<span>🏷️ ${f.tag}</span>`:''}
+                        <span>🕐 ${f.date}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="doc-file-btns">
+                <button class="btn-doc-view" onclick="docViewFile('${f.id}')">👁️ معاينة</button>
+                <button class="btn-doc-edit" onclick="docEditFile('${f.id}')">✏️ تعديل</button>
+                <button class="btn-doc-del" onclick="docDeleteFile('${f.id}')">🗑️ حذف</button>
+            </div>
+        </div>
+    `).join('') + `</div>`;
+    updateDocStats();
+}
+
+function docViewFile(id) {
+    const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+    const file = files.find(f => f.id === id);
+    if(file && file.data) {
+        const w = window.open();
+        w.document.write(`<html><head><title>${file.title}</title></head><body style="margin:0;background:#333;display:flex;justify-content:center;align-items:center;height:100vh;"><iframe src="${file.data}" style="width:96%;height:96%;border:none;border-radius:8px;"></iframe></body></html>`);
+    }
+}
+
+function docDeleteFile(id) {
+    if(!confirm('هل أنت متأكد من حذف هذا الملف؟\nسيختفي الملف من قائمة الطلاب فوراً.')) return;
+    let files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+    files = files.filter(f => f.id !== id);
+    localStorage.setItem('uploadedFiles', JSON.stringify(files));
+    renderDocFilesList();
+    updateDocStats();
+}
+
+function docEditFile(id) {
+    const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+    const f = files.find(f => f.id === id);
+    if(!f) return;
+    document.getElementById('docEditId').value = id;
+    document.getElementById('docEditTitle').value = f.title;
+    document.getElementById('docEditGroup').value = f.group;
+    document.getElementById('docEditType').value = f.type;
+    document.getElementById('docEditTag').value = f.tag || '';
+    const box = document.getElementById('docEditBox');
+    box.classList.add('show');
+    box.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function docCancelEdit() {
+    document.getElementById('docEditBox').classList.remove('show');
+}
+
+function docSaveEdit() {
+    const id = document.getElementById('docEditId').value;
+    const newTitle = document.getElementById('docEditTitle').value.trim();
+    if(!newTitle) { alert('❌ الرجاء إدخال عنوان للمادة العلمية'); return; }
+    let files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+    const idx = files.findIndex(f => f.id === id);
+    if(idx === -1) return;
+    files[idx].title = newTitle;
+    files[idx].group = document.getElementById('docEditGroup').value;
+    files[idx].type = document.getElementById('docEditType').value;
+    files[idx].tag = document.getElementById('docEditTag').value.trim();
+    files[idx].date = new Date().toLocaleString('ar-EG') + ' (تم التعديل)';
+    localStorage.setItem('uploadedFiles', JSON.stringify(files));
+    docCancelEdit();
+    renderDocFilesList();
+    alert('✓ تم تعديل بيانات الملف بنجاح!');
+}
+
+function renderDocStudentList() {
+    const box = document.getElementById('docStudentList');
+    if(!box) return;
+    let html = '';
+    Object.keys(PASSWORDS).forEach(pwd => {
+        const info = PASSWORDS[pwd];
+        const attemptKey = 'att_' + info.group + '_' + info.sid;
+        const used = parseInt(localStorage.getItem(attemptKey) || '0');
+        const blocked = used >= MAX_ATTEMPTS;
+        html += `<div class="student-row ${blocked?'blocked':''}">
+            <div class="student-info">
+                <strong>${pwd}</strong>
+                <br><small>${GROUPS[info.group].name} · طالب رقم: ${info.sid} · محاولات فاشلة: ${used}/${MAX_ATTEMPTS}</small>
+            </div>
+            ${blocked ? `<button class="btn-unlock" onclick="unlock('${info.group}', ${info.sid}); renderDocStudentList();">🔓 فك الحظر</button>` : '<span style="color:var(--success);font-weight:700;font-size:12px;">✓ نشط</span>'}
+        </div>`;
+    });
+    box.innerHTML = html || '<p style="color:var(--text-light);text-align:center;padding:20px;">لا توجد بيانات طلاب</p>';
+}
+
+function renderDocResultsList() {
+    const box = document.getElementById('docResultsList');
+    if(!box) return;
+    const results = JSON.parse(localStorage.getItem('results') || '[]');
+    if(results.length === 0) {
+        box.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:30px;">لا توجد نتائج امتحانات بعد</p>';
+        return;
+    }
+    box.innerHTML = results.map(r => `
+        <div class="student-row">
+            <div class="student-info">
+                <strong>${r.name}</strong>
+                <br><small>رقم الطالب: ${r.user} · ${r.exam} · درجة: ${r.score}/10 · ${r.date}</small>
+            </div>
+            <span style="background:${r.score>=5?'#e8f5e9':'#ffebee'};color:${r.score>=5?'var(--success)':'var(--danger)'};padding:6px 14px;border-radius:10px;font-weight:700;font-size:13px;">${r.score}/10</span>
+        </div>
+    `).join('');
+}
+
+function doctorLogout() {
+    document.getElementById('doctorApp').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('adminPwd').value = '';
+    selectedDocFile = null;
+}
+
+// Drag and drop on doctor drop zone
+document.addEventListener('DOMContentLoaded', () => {
+    const dz = document.getElementById('docDropZone');
+    if(dz) {
+        dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+        dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+        dz.addEventListener('drop', e => {
+            e.preventDefault(); dz.classList.remove('dragover');
+            const f = e.dataTransfer.files;
+            if(f.length > 0) { document.getElementById('docFileInput').files = f; docHandleFile(document.getElementById('docFileInput')); }
+        });
+    }
+});
+
+function switchAdminTab(tab, btn) {
+    document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('admin-'+tab).classList.add('active');
+}
+
+function renderAdminList() {
+    const box = document.getElementById('studentList');
+    let html = '';
+    Object.keys(PASSWORDS).forEach(pwd => {
+        const info = PASSWORDS[pwd];
+        const attemptKey = 'att_' + info.group + '_' + info.sid;
+        const used = parseInt(localStorage.getItem(attemptKey) || '0');
+        const blocked = used >= MAX_ATTEMPTS;
+        html += `
+            <div class="student-row ${blocked?'blocked':''}">
+                <div class="student-info">
+                    <strong>${pwd}</strong>
+                    <br><small>${GROUPS[info.group].name} · طالب رقم: ${info.sid} · محاولات فاشلة: ${used}/${MAX_ATTEMPTS}</small>
+                </div>
+                ${blocked ? `<button class="btn-unlock" onclick="unlock('${info.group}', ${info.sid})">🔓 فك الحظر</button>` : '<span style="color:var(--success);font-weight:700;font-size:12px;">✓ نشط</span>'}
+            </div>
+        `;
+    });
+    box.innerHTML = html;
+}
+
+function unlock(group, sid) {
+    const attemptKey = 'att_' + group + '_' + sid;
+    localStorage.setItem(attemptKey, '0');
+    renderAdminList();
+}
+
+// ===== FILE UPLOAD SYSTEM =====
+function handleFileSelect(input) {
+    const file = input.files[0];
+    if(!file) return;
+
+    if(file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+        alert('❌ يرجى اختيار ملف PDF فقط!');
+        return;
+    }
+
+    if(file.size > 50 * 1024 * 1024) {
+        alert('❌ حجم الملف يتجاوز 50 ميجابايت!');
+        return;
+    }
+
+    const title = document.getElementById('upTitle').value.trim() || file.name.replace('.pdf', '');
+    const group = document.getElementById('upGroup').value;
+    const type = document.getElementById('upType').value;
+
+    const progress = document.getElementById('upProgress');
+    const bar = document.getElementById('upBar');
+    progress.classList.add('show');
+    bar.style.width = '0%';
+
+    const reader = new FileReader();
+
+    reader.onprogress = function(e) {
+        if(e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            bar.style.width = pct + '%';
+        }
+    };
+
+    reader.onload = function(e) {
+        bar.style.width = '100%';
+        setTimeout(() => {
+            const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+            const newFile = {
+                id: 'up_' + Date.now(),
+                title: title,
+                filename: file.name,
+                group: group,
+                type: type,
+                size: (file.size / 1024 / 1024).toFixed(2) + ' MB',
+                date: new Date().toLocaleString('ar-EG'),
+                data: e.target.result
+            };
+            files.push(newFile);
+            localStorage.setItem('uploadedFiles', JSON.stringify(files));
+
+            alert('✓ تم رفع الملف بنجاح!');
+            document.getElementById('upTitle').value = '';
+            progress.classList.remove('show');
+            bar.style.width = '0%';
+            renderFilesList();
+
+            if(currentStudent && (group === currentStudent.group || group === 'ALL')) {
+                renderBooks(currentStudent.group);
+            }
+        }, 500);
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function getUploadedFiles(group, type) {
+    const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+    return files.filter(f => (f.group === group || f.group === 'ALL') && f.type === type).map(f => ({
+        t: f.title,
+        a: 'ملف مرفوع · ' + f.size,
+        p: f.date,
+        id: f.id,
+        isUploaded: true
+    }));
+}
+
+function renderFilesList() {
+    const container = document.getElementById('filesContainer');
+    const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+
+    if(files.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px;">لا توجد مواد علمية مرفوعة بعد. استخدم المنطقة أعلاه لرفع أول ملف PDF.</p>';
+        return;
+    }
+
+    container.innerHTML = files.map((f, i) => `
+        <div class="file-item">
+            <div class="file-info">
+                <div class="file-icon" style="background: ${f.type==='book'?'#e8eaf6':f.type==='exam'?'#fff3e0':'#e8f5e9'}; color: ${f.type==='book'?'var(--primary)':f.type==='exam'?'var(--warning)':'var(--success)'};">
+                    ${f.type==='book'?'📖':f.type==='exam'?'📝':'📎'}
+                </div>
+                <div class="file-details">
+                    <strong>${f.title}</strong>
+                    <small>${f.filename} · ${f.size} · ${GROUPS[f.group]?.name || 'جميع الفرق'} · ${f.type==='book'?'كتاب دراسي':f.type==='exam'?'امتحان':'ملحق'} · ${f.date}</small>
+                </div>
+            </div>
+            <div class="file-actions">
+                <button class="btn-mini btn-mini-view" onclick="viewFile('${f.id}')">👁️ معاينة</button>
+                <button class="btn-mini" style="background:#fff3e0;color:var(--warning);" onmouseover="this.style.background='var(--warning)';this.style.color='white';" onmouseout="this.style.background='#fff3e0';this.style.color='var(--warning)';" onclick="editFile('${f.id}')">✏️ تعديل</button>
+                <button class="btn-mini btn-mini-del" onclick="deleteFile('${f.id}')">🗑️ حذف</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function viewFile(id) {
+    const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+    const file = files.find(f => f.id === id);
+    if(file && file.data) {
+        const newWindow = window.open();
+        newWindow.document.write(`
+            <html><head><title>${file.title}</title></head>
+            <body style="margin:0;background:#333;display:flex;justify-content:center;align-items:center;height:100vh;">
+            <iframe src="${file.data}" style="width:95%;height:95%;border:none;"></iframe>
+            </body></html>
+        `);
+    }
+}
+
+function deleteFile(id) {
+    if(!confirm('هل أنت متأكد من حذف هذا الملف؟')) return;
+    let files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+    files = files.filter(f => f.id !== id);
+    localStorage.setItem('uploadedFiles', JSON.stringify(files));
+    renderFilesList();
+    if(currentStudent) renderBooks(currentStudent.group);
+}
+
+function renderResultsList() {
+    const box = document.getElementById('resultsList');
+    const results = JSON.parse(localStorage.getItem('results') || '[]');
+    if(results.length === 0) {
+        box.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px;">لا توجد نتائج امتحانات بعد</p>';
+        return;
+    }
+    box.innerHTML = results.map(r => `
+        <div class="student-row">
+            <div class="student-info">
+                <strong>${r.name}</strong>
+                <br><small>رقم الطالب: ${r.user} · ${r.exam} · درجة: ${r.score}/10 · ${r.date}</small>
+            </div>
+        </div>
+    `).join('');
+}
+
+function closeAdmin() {
+    document.getElementById('adminModal').style.display = 'none';
+}
+
+
+// ===== تعديل الملفات =====
+function editFile(id) {
+    const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+    const file = files.find(f => f.id === id);
+    if(!file) return;
+
+    document.getElementById('editFileId').value = id;
+    document.getElementById('editTitle').value = file.title;
+    document.getElementById('editGroup').value = file.group;
+    document.getElementById('editType').value = file.type;
+    document.getElementById('editFormBox').style.display = 'block';
+    document.getElementById('editFormBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function cancelEdit() {
+    document.getElementById('editFormBox').style.display = 'none';
+    document.getElementById('editFileId').value = '';
+    document.getElementById('editTitle').value = '';
+}
+
+function saveEdit() {
+    const id = document.getElementById('editFileId').value;
+    const newTitle = document.getElementById('editTitle').value.trim();
+    const newGroup = document.getElementById('editGroup').value;
+    const newType = document.getElementById('editType').value;
+
+    if(!newTitle) {
+        alert('❌ الرجاء إدخال عنوان للمادة العلمية');
+        return;
+    }
+
+    let files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+    const idx = files.findIndex(f => f.id === id);
+    if(idx === -1) return;
+
+    files[idx].title = newTitle;
+    files[idx].group = newGroup;
+    files[idx].type = newType;
+    files[idx].date = new Date().toLocaleString('ar-EG') + ' (تم التعديل)';
+
+    localStorage.setItem('uploadedFiles', JSON.stringify(files));
+
+    alert('✓ تم تعديل المادة العلمية بنجاح!');
+    cancelEdit();
+    renderFilesList();
+
+    if(currentStudent) {
+        renderBooks(currentStudent.group);
+        renderExtras();
+    }
+}
+
+// Drag and drop support
+const dropZone = document.getElementById('dropZone');
+if(dropZone) {
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if(files.length > 0) {
+            document.getElementById('fileInput').files = files;
+            handleFileSelect(document.getElementById('fileInput'));
+        }
+    });
+}
+
+document.getElementById('inName').addEventListener('keypress', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('inStuNum').addEventListener('keypress', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('inPwd').addEventListener('keypress', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('adminPwd').addEventListener('keypress', e => { if(e.key==='Enter') adminAuth(); });
+
+document.getElementById('adminModal').addEventListener('click', e => {
+    if(e.target === document.getElementById('adminModal')) closeAdmin();
+});
+</script>
+</body>
+</html>
